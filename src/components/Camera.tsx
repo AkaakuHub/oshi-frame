@@ -124,9 +124,10 @@ export default function Camera() {
 
   return (
     <div
-      className="relative w-full max-w-md mx-auto overflow-hidden"
+      className="relative w-full max-w-md mx-auto overflow-hidden flex items-center justify-center"
       style={{
-        height: `calc(${viewportHeight}px - env(safe-area-inset-top) - env(safe-area-inset-bottom))`,
+        maxHeight: `calc(${viewportHeight}px - env(safe-area-inset-top) - env(safe-area-inset-bottom))`,
+        aspectRatio: "9/16",
       }}
     >
       <video
@@ -134,7 +135,12 @@ export default function Camera() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 object-cover object-center overflow-hidden max-h-screen"
+        className="absolute inset-0 object-cover object-center overflow-hidden"
+        style={{
+          aspectRatio: "9/16",
+          width: "100%",
+          maxWidth: "100%",
+        }}
       />
       {videoRef.current && (
         <Navigation

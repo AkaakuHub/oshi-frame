@@ -56,7 +56,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
   return (
     <>
       <canvas ref={canvasRef} className="hidden" />
-      <div className="absolute bottom-0 w-full h-[120px] bg-black/20 flex justify-between items-center px-8">
+      <div className="absolute left-0 bottom-0 w-full h-[120px] bg-black/20 flex justify-between items-center px-8">
         <button type="button" className="w-14 h-14 flex justify-center items-center">
           <IconLibraryPhoto size={28} className="text-white" />
         </button>
