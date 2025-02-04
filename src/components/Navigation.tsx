@@ -12,15 +12,12 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
   const shutterButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleCapture = async () => {
-    console.log("handleCapture");
     if (!videoRef.current || !canvasRef.current || !shutterButtonRef.current) return;
     // activeを付与し、200ms後に削除
     // なぜかtailwindのだと反応しない
-    console.log("add opacity-50");
     shutterButtonRef.current.classList.add("opacity-50");
     setTimeout(() => {
       if (shutterButtonRef.current) {
-        console.log("remove opacity-50");
         shutterButtonRef.current.classList.remove("opacity-50");
       }
     }, 200);

@@ -72,9 +72,6 @@ export default function Camera() {
 
         // デバイス一覧を取得し、OBSを含むものを除外
         const devices = await navigator.mediaDevices.enumerateDevices();
-        for (const device of devices) {
-          console.log(device.label);
-        }
         const videoInputs = devices.filter(
           (device) =>
             device.kind === "videoinput"
