@@ -8,6 +8,7 @@ export default function Camera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const localStream = useRef<MediaStream | null>(null);
   const [cameraFacingIsUser, setCameraFacingIsUser] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
 
   const getStream = useCallback((isUser: boolean) => {
     const constraints = {
@@ -32,14 +33,18 @@ export default function Camera() {
         localStream.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          setIsCameraReady(true);
         }
       })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .catch((error) => {
-        console.error(error);
+        if (!isUser) {
+          console.warn("外カメラが利用できないため、カメラをuserモードに切替");
+          getStream(true);
+        }
       });
   }, []);
 
-  // マウント時と切り替え時にストリーム取得
   useEffect(() => {
     getStream(cameraFacingIsUser);
     // コンポーネントアンマウント時にストリーム停止
@@ -59,22 +64,26 @@ export default function Camera() {
 
   return (
     <div
-      className="relative w-full max-w-md mx-auto overflow-hidden aspect-video"
-      style={{ height: "calc(100vh - env(safe-area-inset-top))" }}
+      className="relative w-full mx-auto overflow-y-hidden aspect-video"
+      style={{ height: "calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))" }}
     >
-      <div className="absolute inset-0 overflow-hidden">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="absolute inset-0 object-cover overflow-hidden max-h-screen"
-          style={{
-            aspectRatio: "9 / 16",
-          }}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className="absolute inset-0 object-cover"
+        style={{
+          height: "calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))",
+          aspectRatio: "9 / 16",
+        }}
+      />
+      {isCameraReady && videoRef.current && (
+        <Navigation
+          videoRef={videoRef as React.RefObject<HTMLVideoElement>}
+          toggleCamera={toggleCamera}
         />
-      </div>
-      {videoRef.current && <Navigation videoRef={videoRef as React.RefObject<HTMLVideoElement>} toggleCamera={toggleCamera}/>}
+      )}
     </div>
   );
 }
