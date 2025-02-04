@@ -26,8 +26,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose }: DecoSelectPro
             margin: 0,
             padding: 16,
             width: '100%',
-            borderTopLeftRadius: '16px',
-            borderTopRightRadius: '16px'
+            borderRadius: '16px 16px 0 0'
           }
         }
       }}
