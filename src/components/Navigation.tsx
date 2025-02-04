@@ -1,5 +1,6 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { IconLibraryPhoto, IconCameraRotate } from "@tabler/icons-react";
+import DecoSelect from "./DecoSelect";
 
 interface NavigationProps {
   readonly videoRef: React.RefObject<HTMLVideoElement>;
@@ -10,6 +11,15 @@ interface NavigationProps {
 export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: NavigationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shutterButtonRef = useRef<HTMLButtonElement>(null);
+  const [isDecoSelectOpen, setIsDecoSelectOpen] = useState(false);
+
+  const handleIsDecoSelectOpen = () => {
+    setIsDecoSelectOpen(true);
+  };
+
+  const handleIsDecoSelectClose = () => {
+    setIsDecoSelectOpen(false);
+  };
 
   const handleCapture = async () => {
     if (!videoRef.current || !canvasRef.current || !shutterButtonRef.current) return;
@@ -57,7 +67,12 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
     <>
       <canvas ref={canvasRef} className="hidden" />
       <div className="absolute left-0 bottom-0 w-full h-[120px] bg-black/20 flex justify-between items-center px-8">
-        <button type="button" className="w-14 h-14 flex justify-center items-center">
+        <button 
+        type="button" 
+        className="w-14 h-14 flex justify-center items-center"
+        onClick={handleIsDecoSelectOpen}
+        
+        >
           <IconLibraryPhoto size={28} className="text-white" />
         </button>
 
@@ -72,6 +87,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
           </div>
         </button>
 
+        <DecoSelect isDecoSelectOpen={isDecoSelectOpen} handleIsDecoSelectClose={handleIsDecoSelectClose}/>
 
         {canSwitchCamera ? (
           <button
