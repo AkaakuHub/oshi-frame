@@ -10,6 +10,7 @@ export default function Camera() {
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
   const getStream = useCallback(() => {
     if (videoDevices.length === 0) return;
@@ -45,6 +46,13 @@ export default function Camera() {
   }, [videoDevices, currentDeviceIndex]);
 
   useEffect(() => {
+    const updateHeight = () => {
+      setViewportHeight(window.innerHeight);
+    };
+
+    window.addEventListener("resize", updateHeight);
+    updateHeight(); // 初回実行
+
     const checkCameras = async () => {
       try {
         // まず権限リクエスト
@@ -80,6 +88,8 @@ export default function Camera() {
     };
 
     checkCameras();
+
+    return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
   useEffect(() => {
@@ -101,25 +111,19 @@ export default function Camera() {
   };
 
   return (
-    <>
-      <div
-        className="relative w-full max-w-md mx-auto overflow-hidden aspect-video"
-        style={{ height: "calc(100vh - env(safe-area-inset-top))" }}
-      >
-        <div className="absolute inset-0 overflow-hidden">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="absolute inset-0 object-cover object-center overflow-hidden max-h-screen"
-            style={{
-              aspectRatio: "9 / 16",
-            }}
-          />
-        </div>
-
-      </div>
+    <div
+      className="relative w-full max-w-md mx-auto overflow-hidden"
+      style={{
+        height: `calc(${viewportHeight}px - env(safe-area-inset-top) - env(safe-area-inset-bottom))`,
+      }}
+    >
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className="absolute inset-0 object-cover object-center overflow-hidden max-h-screen"
+      />
       {videoRef.current && (
         <Navigation
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
@@ -127,6 +131,6 @@ export default function Camera() {
           canSwitchCamera={canSwitchCamera}
         />
       )}
-    </>
+    </div>
   );
 }
