@@ -86,9 +86,6 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
             <div className="w-[4rem] h-[4rem] bg-white rounded-full" />
           </div>
         </button>
-
-        <DecoSelect isDecoSelectOpen={isDecoSelectOpen} handleIsDecoSelectClose={handleIsDecoSelectClose}/>
-
         {canSwitchCamera ? (
           <button
             type="button"
@@ -101,6 +98,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
           <div className="w-14 h-14" />
         )}
       </div>
+      <DecoSelect isDecoSelectOpen={isDecoSelectOpen} handleIsDecoSelectClose={handleIsDecoSelectClose}/>
     </>
   );
 }
