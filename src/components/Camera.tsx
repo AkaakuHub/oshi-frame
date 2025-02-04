@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import type React from "react";
@@ -11,6 +12,8 @@ export default function Camera() {
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
+
+  const [filterImageURL, setFilterImageURL] = useState<string | null>(null);
 
   const getStream = useCallback(() => {
     if (videoDevices.length === 0) return;
@@ -122,6 +125,10 @@ export default function Camera() {
     }
   };
 
+  useEffect(() => {
+    setFilterImageURL("/sample.png.pem");
+  }, []);
+
   return (
     <div
       className="relative w-full max-w-md mx-auto overflow-hidden flex items-center justify-center"
@@ -135,18 +142,31 @@ export default function Camera() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 object-cover object-center overflow-hidden"
+        className="absolute inset-0 object-cover object-center overflow-hidden z-0"
         style={{
           aspectRatio: "9/16",
           width: "100%",
           maxWidth: "100%",
         }}
       />
+      {filterImageURL &&
+        <img
+          src={filterImageURL}
+          alt="sample"
+          className="absolute inset-0 object-cover object-center z-10 pointer-events-none"
+          style={{
+            aspectRatio: "9/16",
+            width: "100%",
+            maxWidth: "100%",
+          }}
+        />}
+
       {videoRef.current && (
         <Navigation
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
           toggleCamera={toggleCamera}
           canSwitchCamera={canSwitchCamera}
+          filterImageURL={filterImageURL}
         />
       )}
     </div>

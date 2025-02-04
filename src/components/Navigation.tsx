@@ -6,9 +6,10 @@ interface NavigationProps {
   readonly videoRef: React.RefObject<HTMLVideoElement>;
   readonly toggleCamera: () => void;
   readonly canSwitchCamera: boolean;
+  readonly filterImageURL: string | null;
 }
 
-export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: NavigationProps) {
+export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, filterImageURL }: NavigationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shutterButtonRef = useRef<HTMLButtonElement>(null);
   const [isDecoSelectOpen, setIsDecoSelectOpen] = useState(false);
@@ -49,6 +50,18 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
     const sy = 0;
     context.drawImage(videoRef.current, sx, sy, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
 
+    // filterImageURLがあれば重ねる
+    if (filterImageURL) {
+      const filterImage = new Image();
+      filterImage.src = filterImageURL;
+      await new Promise((resolve) => {
+        filterImage.onload = () => {
+          context.drawImage(filterImage, 0, 0, canvasWidth, canvasHeight);
+          resolve(null);
+        };
+      });
+    }
+
     canvas.toBlob(async (blob) => {
       if (!blob) return;
 
@@ -66,12 +79,12 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
   return (
     <>
       <canvas ref={canvasRef} className="hidden" />
-      <div className="absolute left-0 bottom-0 w-full h-[120px] bg-black/20 flex justify-between items-center px-8">
-        <button 
-        type="button" 
-        className="w-14 h-14 flex justify-center items-center"
-        onClick={handleIsDecoSelectOpen}
-        
+      <div className="absolute left-0 bottom-0 w-full h-[120px] flex justify-between items-center px-8 z-20">
+        <button
+          type="button"
+          className="w-14 h-14 flex justify-center items-center"
+          onClick={handleIsDecoSelectOpen}
+
         >
           <IconLibraryPhoto size={28} className="text-white" />
         </button>
@@ -98,7 +111,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
           <div className="w-14 h-14" />
         )}
       </div>
-      <DecoSelect isDecoSelectOpen={isDecoSelectOpen} handleIsDecoSelectClose={handleIsDecoSelectClose}/>
+      <DecoSelect isDecoSelectOpen={isDecoSelectOpen} handleIsDecoSelectClose={handleIsDecoSelectClose} />
     </>
   );
 }
