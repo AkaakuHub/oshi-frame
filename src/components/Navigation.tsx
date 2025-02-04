@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { IconAdjustments, IconCameraRotate, IconCircle } from "@tabler/icons-react";
+import { IconLibraryPhoto, IconCameraRotate, IconCircle } from "@tabler/icons-react";
 
 interface NavigationProps {
   readonly videoRef: React.RefObject<HTMLVideoElement>;
@@ -49,16 +49,19 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
       <canvas ref={canvasRef} className="hidden" />
       <div className="absolute bottom-0 w-full h-[120px] bg-black/20 flex justify-between items-center px-8">
         <button type="button" className="w-14 h-14 flex justify-center items-center">
-          <IconAdjustments size={28} className="text-white" />
+          <IconLibraryPhoto size={28} className="text-white" />
         </button>
 
         <button
           type="button"
-          className="w-20 h-20 bg-white flex justify-center items-center rounded-full border-4 border-white/80 shadow-lg"
+          className="w-20 h-20 flex justify-center items-center rounded-full border-4 border-black bg-transparent"
           onClick={handleCapture}
         >
-          <IconCircle size={64} className="text-black" />
+          <div className="w-[4.5rem] h-[4.5rem] flex justify-center items-center rounded-full">
+            <div className="w-[4rem] h-[4rem] bg-white rounded-full" />
+          </div>
         </button>
+
 
         {canSwitchCamera ? (
           <button
