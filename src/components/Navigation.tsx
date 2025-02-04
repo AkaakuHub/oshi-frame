@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { IconLibraryPhoto, IconCameraRotate, IconCircle } from "@tabler/icons-react";
+import { IconLibraryPhoto, IconCameraRotate } from "@tabler/icons-react";
 
 interface NavigationProps {
   readonly videoRef: React.RefObject<HTMLVideoElement>;

@@ -7,16 +7,19 @@ import Navigation from "./Navigation";
 export default function Camera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const localStream = useRef<MediaStream | null>(null);
-  const [cameraFacingIsUser, setCameraFacingIsUser] = useState(false);
-  const [isCameraReady, setIsCameraReady] = useState(false);
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
 
-  const getStream = useCallback((isUser: boolean) => {
+  const getStream = useCallback(() => {
+    if (videoDevices.length === 0) return;
+    // 選択中のデバイスを使用
+    const selectedDevice = videoDevices[currentDeviceIndex];
     const constraints = {
       video: {
+        deviceId: { exact: selectedDevice.deviceId },
         width: 1920,
         height: 1080,
-        facingMode: isUser ? "user" : { exact: "environment" },
       },
       audio: false,
     };
@@ -34,39 +37,53 @@ export default function Camera() {
         localStream.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          setIsCameraReady(true);
         }
       })
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .catch((error) => {
-        if (!isUser) {
-          console.warn("外カメラが利用できないため、カメラをuserモードに切替");
-          getStream(true);
-        }
+        console.error("getUserMediaエラー:", error);
       });
-  }, []);
+  }, [videoDevices, currentDeviceIndex]);
 
   useEffect(() => {
     const checkCameras = async () => {
       try {
-        // まず権限をリクエスト
+        // まず権限リクエスト
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         for (const track of stream.getTracks()) {
           track.stop();
         }
 
-        // その後デバイス一覧を取得
+        // デバイス一覧を取得し、OBSを含むものを除外
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoInputs = devices.filter(device => device.kind === "videoinput" && !device.label.includes("OBS"));
+        for (const device of devices) {
+          console.log(device.label);
+        }
+        const videoInputs = devices.filter(
+          (device) =>
+            device.kind === "videoinput"
+            && device.label !== "背面デュアル広角カメラ"
+          // && device.label !== "背面超広角カメラ"
+          // && !device.label.includes("OBS")
+        );
         setCanSwitchCamera(videoInputs.length > 1);
+        setVideoDevices(videoInputs);
+        if (videoInputs.length > 0) {
+          // iPhone14: 前面カメラ, 背面デュアル広角カメラ, 背面超広角カメラ, 背面カメラ
+          const userIndex = videoInputs.findIndex((device) =>
+            /背面カメラ/i.test(device.label)
+          );
+          setCurrentDeviceIndex(userIndex !== -1 ? userIndex : 0);
+        }
       } catch (error) {
         console.error("カメラの取得に失敗しました", error);
       }
     };
 
     checkCameras();
-    getStream(cameraFacingIsUser);
+  }, []);
 
+  useEffect(() => {
+    getStream();
     return () => {
       if (localStream.current) {
         for (const track of localStream.current.getTracks()) {
@@ -74,36 +91,36 @@ export default function Camera() {
         }
       }
     };
-  }, [cameraFacingIsUser, getStream]);
+  }, [getStream]);
 
-
-  // 切替ボタン押下時処理
+  // 切替ボタン押下時処理（配列内で循環）
   const toggleCamera = () => {
-    if (canSwitchCamera) {
-      setCameraFacingIsUser(prev => !prev);
+    if (canSwitchCamera && videoDevices.length > 1) {
+      setCurrentDeviceIndex((prev) => (prev + 1) % videoDevices.length);
     }
   };
 
   return (
     <>
       <div
-        className="relative w-full mx-auto overflow-y-hidden aspect-video"
-        style={{ height: "calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))" }}
+        className="relative w-full max-w-md mx-auto overflow-hidden aspect-video"
+        style={{ height: "calc(100vh - env(safe-area-inset-top))" }}
       >
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="absolute inset-0 object-cover"
-          style={{
-            height: "calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))",
-            aspectRatio: "9 / 16",
-          }}
-        />
+        <div className="absolute inset-0 overflow-hidden">
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="absolute inset-0 object-cover object-center overflow-hidden max-h-screen"
+            style={{
+              aspectRatio: "9 / 16",
+            }}
+          />
+        </div>
 
       </div>
-      {isCameraReady && videoRef.current && (
+      {videoRef.current && (
         <Navigation
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
           toggleCamera={toggleCamera}
