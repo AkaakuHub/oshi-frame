@@ -1,19 +1,20 @@
-import type React from "react";
 import { useRef } from "react";
+import { IconCameraRotate, IconCircle } from "@tabler/icons-react";
 
 interface NavigationProps {
   readonly videoRef: React.RefObject<HTMLVideoElement>;
   readonly toggleCamera: () => void;
+  readonly canSwitchCamera: boolean;
 }
 
-export default function Navigation({ videoRef, toggleCamera }: NavigationProps) {
+export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: NavigationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleCapture = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     if (!context) return;
 
     const videoWidth = videoRef.current.videoWidth;
@@ -27,44 +28,43 @@ export default function Navigation({ videoRef, toggleCamera }: NavigationProps) 
 
     const sx = (videoWidth - canvasWidth) / 2;
     const sy = 0;
-    context.drawImage(
-      videoRef.current,
-      sx,
-      sy,
-      canvasWidth,
-      canvasHeight,
-      0,
-      0,
-      canvasWidth,
-      canvasHeight
-    );
+    context.drawImage(videoRef.current, sx, sy, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
 
-      const text: string = "画像です。"
-      const file = new File([blob], "jimaku.png", { type: "image/png" });
+      const text: string = "画像です。";
+      const file = new File([blob], "photo.png", { type: "image/png" });
       navigator.share({
         text: decodeURI(text),
-        files: [file]
-      }).then(() => {
-        console.log("Share was successful.");
+        files: [file],
       }).catch((error) => {
         console.log("Sharing failed", error);
       });
     });
   };
+
   return (
     <>
       <canvas ref={canvasRef} className="hidden" />
-      <div className="w-full h-[200px] bg-slate-600 opacity-50 fixed bottom-0">
-        <div className="flex justify-center items-center h-full">
-          <button type="button" className="w-32 h-32 bg-white p-2 rounded-full" onClick={handleCapture}>
+      <div className="absolute bottom-0 w-full h-[120px] flex justify-center items-center gap-6">
+        {canSwitchCamera && (
+          <button
+            type="button"
+            className="w-14 h-14 bg-white/80 text-black flex justify-center items-center rounded-full"
+            onClick={toggleCamera}
+          >
+            <IconCameraRotate size={28} />
           </button>
-          <button type="button" className="w-16 h-16 bg-white p-2 rounded-full" onClick={toggleCamera}>
-          </button>
-        </div>
+        )}
+        <button
+          type="button"
+          className="w-20 h-20 bg-white flex justify-center items-center rounded-full border-4 border-white/80 shadow-lg"
+          onClick={handleCapture}
+        >
+          <IconCircle size={64} className="text-black" />
+        </button>
       </div>
     </>
-  )
+  );
 }
