@@ -9,9 +9,21 @@ interface NavigationProps {
 
 export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: NavigationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const shutterButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleCapture = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    console.log("handleCapture");
+    if (!videoRef.current || !canvasRef.current || !shutterButtonRef.current) return;
+    // activeを付与し、200ms後に削除
+    // なぜかtailwindのだと反応しない
+    console.log("add opacity-50");
+    shutterButtonRef.current.classList.add("opacity-50");
+    setTimeout(() => {
+      if (shutterButtonRef.current) {
+        console.log("remove opacity-50");
+        shutterButtonRef.current.classList.remove("opacity-50");
+      }
+    }, 200);
 
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -53,6 +65,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera }: 
         </button>
 
         <button
+          ref={shutterButtonRef}
           type="button"
           className="w-20 h-20 flex justify-center items-center rounded-full border-4 border-black bg-transparent"
           onClick={handleCapture}

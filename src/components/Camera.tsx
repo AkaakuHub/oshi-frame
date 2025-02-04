@@ -10,7 +10,7 @@ export default function Camera() {
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
-  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const [viewportHeight, setViewportHeight] = useState(0);
 
   const getStream = useCallback(() => {
     if (videoDevices.length === 0) return;
