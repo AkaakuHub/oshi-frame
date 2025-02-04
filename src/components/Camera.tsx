@@ -47,15 +47,26 @@ export default function Camera() {
   }, []);
 
   useEffect(() => {
-    // カメラの切り替え可否をチェック
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      console.log(devices);
-      const videoInputs = devices.filter(device => device.kind === "videoinput" && !device.label.includes("OBS"));
-      console.log(videoInputs);
-      setCanSwitchCamera(videoInputs.length > 1);
-    });
+    const checkCameras = async () => {
+      try {
+        // まず権限をリクエスト
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        for (const track of stream.getTracks()) {
+          track.stop();
+        }
+
+        // その後デバイス一覧を取得
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(device => device.kind === "videoinput" && !device.label.includes("OBS"));
+        setCanSwitchCamera(videoInputs.length > 1);
+      } catch (error) {
+        console.error("カメラの取得に失敗しました", error);
+      }
+    };
+
+    checkCameras();
     getStream(cameraFacingIsUser);
-    // コンポーネントアンマウント時にストリーム停止
+
     return () => {
       if (localStream.current) {
         for (const track of localStream.current.getTracks()) {
@@ -64,6 +75,7 @@ export default function Camera() {
       }
     };
   }, [cameraFacingIsUser, getStream]);
+
 
   // 切替ボタン押下時処理
   const toggleCamera = () => {
