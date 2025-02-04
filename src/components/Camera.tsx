@@ -88,8 +88,14 @@ export default function Camera() {
           );
           setCurrentDeviceIndex(userIndex !== -1 ? userIndex : 0);
         }
-      } catch (error) {
-        console.error("カメラの取得に失敗しました", error);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          if (error.name === "NotAllowedError") {
+            alert("カメラへのアクセスが拒否されました。使用するには許可をする必要があります。このページを再読み込みしてください。");
+          } else {
+            alert("カメラの取得に失敗しました。");
+          }
+        }
       }
     };
 
