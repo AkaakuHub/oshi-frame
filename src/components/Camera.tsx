@@ -53,6 +53,15 @@ export default function Camera() {
     window.addEventListener("resize", updateHeight);
     updateHeight(); // 初回実行
 
+    const touchHandler = (event: TouchEvent) => {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    };
+    document.addEventListener('touchstart', touchHandler, {
+      passive: false
+    });
+
     const checkCameras = async () => {
       try {
         // まず権限リクエスト
