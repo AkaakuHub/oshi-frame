@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { Box, Dialog, Modal, Slide } from "@mui/material";
 import { IconCopyPlus, IconX } from "@tabler/icons-react";
+import dynamic from "next/dynamic";
+
+const ImageEditor = dynamic(() => import("./ImageEditor"), { ssr: false });
 
 const Transition = React.forwardRef(function Transition(props: { children: React.ReactElement }, ref) {
   return <Slide direction="up" ref={ref} {...props}>{props.children}</Slide>;
@@ -19,22 +22,10 @@ interface DecoSelectProps {
 const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArray, setFilterImageArray, filterImageIndex, setFilterImageIndex }: DecoSelectProps) => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
-  // 画像が選択されたときのハンドラ
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result === "string") {
-        setFilterImageArray((prev: string[]) => [...prev, result]);
-      } else {
-        console.error("読み込んだ結果の型がstringではありません");
-      }
-    };
-    reader.readAsDataURL(file);
+  const onCompleteHandler = (data: string) => {
+    setFilterImageArray((prev: string[]) => [...prev, data]);
     setIsUploadModalOpen(false);
-  };
+  }
 
   const handleDelete = (index: number) => {
     setFilterImageArray((prev: string[]) => prev.filter((_, i) => i !== index));
@@ -78,6 +69,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                   <IconCopyPlus size={32} className="text-black" />
                 </button>
               </div>
+
               {filterImageArray && filterImageArray.length > 0 && (
                 filterImageArray.map((filterImage: string, index: number) => (
                   <div
@@ -109,7 +101,10 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
           </div>
         </Dialog>
       </div>
-      <Modal open={isUploadModalOpen} onClose={() => setIsUploadModalOpen(false)}>
+      <Modal
+        open={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+      >
         <Box
           sx={{
             position: "absolute",
@@ -121,7 +116,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
             p: 4,
           }}
         >
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+          <ImageEditor onCompleteHandler={onCompleteHandler}/>
         </Box>
       </Modal>
     </>
