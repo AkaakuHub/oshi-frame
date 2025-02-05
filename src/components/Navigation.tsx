@@ -7,7 +7,7 @@ interface NavigationProps {
   readonly toggleCamera: () => void;
   readonly canSwitchCamera: boolean;
   readonly filterImageArray: string[] | null;
-  readonly setFilterImageArray: (array: string[]) => void;
+  readonly setFilterImageArray: React.Dispatch<React.SetStateAction<string[]>>;
   readonly filterImageIndex: number;
   readonly setFilterImageIndex: (index: number) => void;
 }

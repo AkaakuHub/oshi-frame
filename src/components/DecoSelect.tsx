@@ -11,7 +11,7 @@ interface DecoSelectProps {
   readonly isDecoSelectOpen: boolean;
   readonly handleIsDecoSelectClose: () => void;
   readonly filterImageArray: string[] | null;
-  readonly setFilterImageArray: (array: string[]) => void;
+  readonly setFilterImageArray: React.Dispatch<React.SetStateAction<string[]>>;
   readonly filterImageIndex: number;
   readonly setFilterImageIndex: (index: number) => void;
 }
@@ -25,8 +25,12 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      // arrayの末尾に追加
-      setFilterImageArray((prev: string[]) => [...prev, reader.result as string])
+      const result = reader.result;
+      if (typeof result === "string") {
+        setFilterImageArray((prev: string[]) => [...prev, result]);
+      } else {
+        console.error("読み込んだ結果の型がstringではありません");
+      }
     };
     reader.readAsDataURL(file);
     setIsUploadModalOpen(false);
