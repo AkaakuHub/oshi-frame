@@ -6,10 +6,12 @@ interface NavigationProps {
   readonly videoRef: React.RefObject<HTMLVideoElement>;
   readonly toggleCamera: () => void;
   readonly canSwitchCamera: boolean;
-  readonly filterImageURL: string | null;
+  readonly filterImageArray: string[] | null;
+  readonly filterImageIndex: number;
+  readonly setFilterImageIndex: (index: number) => void;
 }
 
-export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, filterImageURL }: NavigationProps) {
+export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, filterImageArray, filterImageIndex, setFilterImageIndex }: NavigationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shutterButtonRef = useRef<HTMLButtonElement>(null);
   const [isDecoSelectOpen, setIsDecoSelectOpen] = useState(false);
@@ -51,9 +53,9 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
     context.drawImage(videoRef.current, sx, sy, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
 
     // filterImageURLがあれば重ねる
-    if (filterImageURL) {
+    if (filterImageArray && filterImageArray.length > 0) {
       const filterImage = new Image();
-      filterImage.src = filterImageURL;
+      filterImage.src = filterImageArray[filterImageIndex];
       await new Promise((resolve) => {
         filterImage.onload = () => {
           context.drawImage(filterImage, 0, 0, canvasWidth, canvasHeight);
@@ -111,7 +113,13 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
           <div className="w-14 h-14" />
         )}
       </div>
-      <DecoSelect isDecoSelectOpen={isDecoSelectOpen} handleIsDecoSelectClose={handleIsDecoSelectClose} />
+      <DecoSelect
+        isDecoSelectOpen={isDecoSelectOpen}
+        handleIsDecoSelectClose={handleIsDecoSelectClose}
+        filterImageArray={filterImageArray}
+        filterImageIndex={filterImageIndex}
+        setFilterImageIndex={setFilterImageIndex}
+      />
     </>
   );
 }

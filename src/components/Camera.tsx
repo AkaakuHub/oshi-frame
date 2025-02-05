@@ -13,7 +13,9 @@ export default function Camera() {
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
 
-  const [filterImageURL, setFilterImageURL] = useState<string | null>(null);
+  // const [filterImageURL, setFilterImageURL] = useState<string | null>(null);
+  const [filterImageArray, setFilterImageArray] = useState<string[]>([]);
+  const [filterImageIndex, setFilterImageIndex] = useState(0);
 
   const getStream = useCallback(() => {
     if (videoDevices.length === 0) return;
@@ -64,6 +66,16 @@ export default function Camera() {
     document.addEventListener('touchstart', touchHandler, {
       passive: false
     });
+
+    // localStorageに保存されたフィルター画像たちを取得
+    if (localStorage.getItem("filter_images_v1")) {
+      const data = JSON.parse(localStorage.getItem("filter_images_v1") as string);
+      console.log(data, "was read from localStorage");
+      setFilterImageArray(data);
+    } else {
+      // 初めてのときはinit
+      localStorage.setItem("filter_images_v1", JSON.stringify([]));
+    }
 
     const checkCameras = async () => {
       try {
@@ -125,10 +137,6 @@ export default function Camera() {
     }
   };
 
-  useEffect(() => {
-    setFilterImageURL("/sample.png.pem");
-  }, []);
-
   return (
     <div
       className="relative w-full max-w-md mx-auto overflow-hidden flex items-center justify-center"
@@ -149,9 +157,9 @@ export default function Camera() {
           maxWidth: "100%",
         }}
       />
-      {filterImageURL &&
+      {filterImageArray.length > 0 &&
         <img
-          src={filterImageURL}
+          src={filterImageArray[filterImageIndex]}
           alt="sample"
           className="absolute inset-0 object-cover object-center z-10 pointer-events-none"
           style={{
@@ -166,7 +174,9 @@ export default function Camera() {
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
           toggleCamera={toggleCamera}
           canSwitchCamera={canSwitchCamera}
-          filterImageURL={filterImageURL}
+          filterImageArray={filterImageArray}
+          filterImageIndex={filterImageIndex}
+          setFilterImageIndex={setFilterImageIndex}
         />
       )}
     </div>
