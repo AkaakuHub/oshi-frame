@@ -57,14 +57,18 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
         >
           <div className="relative bg-white min-h-[400px] max-w-full">
             <IconX size={36} onClick={handleIsDecoSelectClose} className="cursor-pointer absolute top-0 right-0" />
-            <div className="mt-14 px-4 grid grid-cols-4 gap-4">
-              <button
-                type="button"
-                className="w-20 h-20 rounded-xl border-2 border-black border-dashed flex justify-center items-center"
-                onClick={() => setIsUploadModalOpen(true)}
+            <div className="mt-14 px-4 flex flex-wrap justify-evenly content-evenly gap-4">
+              <div
+                className="relative flex justify-center items-center"
               >
-                <IconCopyPlus size={32} className="text-black" />
-              </button>
+                <button
+                  type="button"
+                  className="w-20 h-20 rounded-xl border-2 border-black border-dashed flex justify-center items-center"
+                  onClick={() => setIsUploadModalOpen(true)}
+                >
+                  <IconCopyPlus size={32} className="text-black" />
+                </button>
+              </div>
               {filterImageArray && filterImageArray.length > 0 && (
                 filterImageArray.map((filterImage: string, index: number) => (
                   <div
