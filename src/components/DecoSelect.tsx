@@ -43,7 +43,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
     // フィルターなしは-1
     if (filterImageIndex === index) {
       setFilterImageIndex(-1);
-    } else {
+    } else if (index < filterImageIndex) {
       setFilterImageIndex(filterImageIndex - 1);
     }
     setFilterImageArray((prev: string[]) => prev.filter((_, i) => i !== index));

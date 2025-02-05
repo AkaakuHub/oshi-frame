@@ -132,6 +132,12 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
   const [containerScale, setContainerScale] = useState(1);
   const STAGE_WIDTH = 1080;
   const STAGE_HEIGHT = 1920;
+  const [exporting, setExporting] = useState(false);
+  const currentEditingIdRef = useRef<string | null>(currentEditingId);
+
+  useEffect(() => {
+    currentEditingIdRef.current = currentEditingId;
+  }, [currentEditingId]);
 
   useEffect(() => {
     const fitStageIntoParentContainer = () => {
@@ -147,6 +153,19 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     window.addEventListener("resize", fitStageIntoParentContainer);
     return () => window.removeEventListener("resize", fitStageIntoParentContainer);
   }, []);
+
+  useEffect(() => {
+    if (exporting && currentEditingIdRef.current === null) {
+      if (stageRef.current) {
+        const originalScale = stageRef.current.scaleX();
+        stageRef.current.scale({ x: 1, y: 1 });
+        const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+        stageRef.current.scale({ x: originalScale, y: originalScale });
+        onCompleteHandler(dataURL);
+        setExporting(false);
+      }
+    }
+  }, [exporting, onCompleteHandler]);
 
   const readFileAsDataURL = (file: File): Promise<string> => {
     return new Promise((resolve) => {
@@ -249,28 +268,27 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     setCurrentEditingId(null);
   };
 
-  const exportCanvas = () => {
-    // 青い枠線を消すために選択状態を解除
-    setCurrentEditingId(null);
-    // まずは選択状態を解除して再レンダリングされるのを待つ
-    requestAnimationFrame(() => {
-      // 更に一度描画完了を待つ
-      requestAnimationFrame(() => {
-        if (stageRef.current) {
-          // 必要に応じてキャンバスの scale を一時的にリセット
-          const originalScale = stageRef.current.scaleX();
-          stageRef.current.scale({ x: 1, y: 1 });
-          // キャンバスを再描画
-          stageRef.current.batchDraw();
-          const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-          // スケールを元に戻す
-          stageRef.current.scale({ x: originalScale, y: originalScale });
-          onCompleteHandler(dataURL);
-        }
-      });
-    });
-  };
-
+const exportCanvas = () => {
+  // 青い枠線を外すために選択状態を解除
+	setCurrentEditingId(null);
+	// まずは選択状態を解除して再レンダリングされるのを待つ
+	requestAnimationFrame(() => {
+		// 更に一度描画完了を待つ
+		requestAnimationFrame(() => {
+			if (stageRef.current) {
+				// 必要に応じてキャンバスのscaleを一時的にリセット
+				const originalScale = stageRef.current.scaleX();
+				stageRef.current.scale({ x: 1, y: 1 });
+				// キャンバスを再描画
+				stageRef.current.batchDraw();
+				const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+				// スケールを元に戻す
+				stageRef.current.scale({ x: originalScale, y: originalScale });
+				onCompleteHandler(dataURL);
+			}
+		});
+	});
+};
   // 現在編集中の画像のscaleを取得（なければ 1）
   const currentImageScale =
     currentEditingId && images.find((img) => img.id === currentEditingId)
