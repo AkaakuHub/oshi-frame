@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
-import { Box, Dialog, Modal, Slide } from "@mui/material";
+import { Box, Button, Dialog, Modal, Slide } from "@mui/material";
 import { IconBan, IconCopyPlus, IconX } from "@tabler/icons-react";
 import dynamic from "next/dynamic";
 
@@ -21,6 +21,7 @@ interface DecoSelectProps {
 
 const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArray, setFilterImageArray, filterImageIndex, setFilterImageIndex }: DecoSelectProps) => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isDoubleCheckModalOpen, setIsDoubleCheckModalOpen] = useState(false);
 
   const onCompleteHandler = (data: string) => {
     setFilterImageArray((prev: string[]) => [...prev, data]);
@@ -39,10 +40,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
   }
 
   const handleModalClose = () => {
-    const userConfirmed = window.confirm("本当に閉じますか？");
-    if (userConfirmed) {
-      setIsUploadModalOpen(false);
-    }
+    setIsDoubleCheckModalOpen(true);
   }
 
   return (
@@ -143,6 +141,44 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
           }}
         >
           <ImageEditor onClose={handleModalClose} onCompleteHandler={onCompleteHandler} />
+        </Box>
+      </Modal>
+      <Modal
+        open={isDoubleCheckModalOpen}
+        onClose={() => setIsDoubleCheckModalOpen(false)}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 1,
+            borderRadius: "16px",
+          }}
+        >
+          <div className="p-4 w-[200px] flex flex-col items-center">
+            <p>本当に閉じますか？</p>
+            <div className="flex flex-row justify-between w-full mt-4 ">
+              <Button onClick={() => setIsDoubleCheckModalOpen(false)} color="info"
+                autoFocus
+                sx={{
+                  fontSize: "1.1rem",
+                }}
+              >いいえ</Button>
+              <Button onClick={() => {
+                setIsDoubleCheckModalOpen(false);
+                setIsUploadModalOpen(false);
+              }}
+                color="error"
+                sx={{
+                  fontSize: "1.1rem",
+                }}
+              >はい</Button>
+            </div>
+          </div>
         </Box>
       </Modal>
     </>
