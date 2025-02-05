@@ -114,6 +114,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
+            borderRadius: "16px",
           }}
         >
           <ImageEditor onCompleteHandler={onCompleteHandler}/>
