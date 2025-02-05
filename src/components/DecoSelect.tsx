@@ -27,6 +27,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
     // ここで参照されるarrayは更新されていないので、直接lengthを参照する
     setFilterImageIndex(filterImageArray ? filterImageArray.length : 0);
     setIsUploadModalOpen(false);
+    handleIsDecoSelectClose();
   }
 
   const handleDelete = (index: number) => {
@@ -62,7 +63,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                 width: "100%",
                 borderRadius: "16px 16px 0 0",
                 zIndex: 20,
-                background: "linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.8) 20%, rgba(255, 255, 255, 1) 100%)",
+                background: "linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0.75) 100%)",
               }
             }
           }}
