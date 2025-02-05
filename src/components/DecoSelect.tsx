@@ -24,6 +24,14 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
   const [isDoubleCheckModalOpen, setIsDoubleCheckModalOpen] = useState(false);
 
   const onCompleteHandler = (data: string) => {
+    if (!filterImageArray) return;
+    // もし全く同じ画像があった場合エラーになるので追加しない
+    for (const filterImage of filterImageArray) {
+      if (filterImage === data) {
+        alert("その画像は既に存在します。");
+        return;
+      }
+    }
     setFilterImageArray((prev: string[]) => [...prev, data]);
     // ここで参照されるarrayは更新されていないので、直接lengthを参照する
     setFilterImageIndex(filterImageArray ? filterImageArray.length : 0);
