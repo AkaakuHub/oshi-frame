@@ -36,6 +36,10 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
     setIsUploadModalOpen(false);
   };
 
+  const handleDelete = (index: number) => {
+    setFilterImageArray((prev: string[]) => prev.filter((_, i) => i !== index));
+  }
+
   return (
     <>
       <div className="relative z-20">
@@ -54,7 +58,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                 width: "100%",
                 borderRadius: "16px 16px 0 0",
                 zIndex: 20,
-                backgroundColor: "#fefff1",
+                background: "linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.8) 20%, rgba(255, 255, 255, 1) 100%)",
               }
             }
           }}
@@ -64,11 +68,11 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
             <IconX size={36} onClick={handleIsDecoSelectClose} className="cursor-pointer absolute top-0 right-0" />
             <div className="mt-14 px-4 grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-4">
               <div
-                className="relative flex justify-center items-center bg-white"
+                className="relative flex justify-center items-center"
               >
                 <button
                   type="button"
-                  className="w-20 h-20 rounded-xl border-2 border-black border-dashed flex justify-center items-center"
+                  className="w-20 h-20 rounded-xl border-2 bg-white border-black border-dashed flex justify-center items-center"
                   onClick={() => setIsUploadModalOpen(true)}
                 >
                   <IconCopyPlus size={32} className="text-black" />
@@ -78,11 +82,11 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                 filterImageArray.map((filterImage: string, index: number) => (
                   <div
                     key={filterImage}
-                    className="relative flex justify-center items-center bg-white"
+                    className="relative flex justify-center items-center"
                   >
                     <button
                       type="button"
-                      className={`w-20 h-20 rounded-xl border-2 border-black ${filterImageIndex === index ? "border-blue-500 shadow-xl" : ""}`}
+                      className={`w-20 h-20 rounded-xl border-2 bg-white border-black ${filterImageIndex === index ? "border-blue-500 shadow-xl" : ""}`}
                       onClick={() => setFilterImageIndex(index)}
                     >
                       <img
@@ -90,6 +94,13 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                         alt={`deco-${index}`}
                         className="w-full h-full object-cover object-center rounded-[0.65rem]"
                       />
+                    </button>
+                    <button
+                      type="button"
+                      className="absolute top-[-8px] right-0 w-8 h-8 bg-white rounded-full flex justify-center items-center border-2 border-black"
+                      onClick={() => handleDelete(index)}
+                    >
+                      <IconX size={16} />
                     </button>
                   </div>
                 ))
