@@ -236,7 +236,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
       : 1;
 
   return (
-    <div className="w-[80vw] h-[80dvh] p-2 flex flex-col justify-between items-center gap-4">
+    <div className="w-[95vw] h-[95dvh] p-2 flex flex-col justify-between items-center gap-2">
       <div className="flex justify-between items-center w-full px-4">
         <Button
           onClick={onClose}
@@ -290,20 +290,17 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
           </Stage>
         </div>
       </div>
-      <div className="h-12 flex justify-center items-center flex-col gap-2 p-4 w-full">
+      <div className="h-[160px] flex justify-center items-center flex-col gap-2 px-4 py-1 w-full">
         <div className="w-full">
-          {currentEditingId ? (
-            <Slider
-              value={currentImageScale}
-              min={0.1}
-              max={5.0}
-              step={0.01}
-              onChange={(e, value) => handleSliderChange(e, value as number)}
-              aria-labelledby="image-scale-slider"
-            />
-          ) : (
-            <div className="w-full h-[50px]" />
-          )}
+          <Slider
+            value={currentImageScale}
+            min={0.1}
+            max={5.0}
+            step={0.01}
+            onChange={(e, value) => handleSliderChange(e, value as number)}
+            aria-labelledby="image-scale-slider"
+            disabled={!currentEditingId}
+          />
         </div>
         <div className="w-full flex justify-between items-center">
           <Button
