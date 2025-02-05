@@ -129,6 +129,11 @@ export default function Camera() {
     };
   }, [getStream]);
 
+  //arrayが変わったらlocalStorageに保存
+  useEffect(() => {
+    localStorage.setItem("filter_images_v1", JSON.stringify(filterImageArray));
+  }, [filterImageArray]);
+
   // 切替ボタン押下時処理（配列内で循環）
   const toggleCamera = () => {
     if (canSwitchCamera && videoDevices.length > 1) {
