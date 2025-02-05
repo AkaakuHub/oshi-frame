@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconLibraryPhoto, IconCameraRotate } from "@tabler/icons-react";
 import DecoSelect from "./DecoSelect";
 
@@ -17,6 +17,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shutterButtonRef = useRef<HTMLButtonElement>(null);
   const [isDecoSelectOpen, setIsDecoSelectOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   const handleIsDecoSelectOpen = () => {
     setIsDecoSelectOpen(true);
@@ -78,27 +79,37 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
     });
   };
 
+  useEffect(() => {
+    setIsTutorialOpen(false);
+    setTimeout(() => {
+      setIsTutorialOpen(true);
+    }, 750);
+  }, []);
+
   return (
     <>
       <canvas ref={canvasRef} className="hidden" />
       <div className="absolute left-0 bottom-0 w-full h-[120px] flex justify-between items-center px-8 z-20">
-        <button
-          type="button"
+        <div
           className="relative w-14 h-14 flex justify-center items-center"
-          onClick={handleIsDecoSelectOpen}
         >
           {filterImageArray &&
             <img
               src="/tutorial1.png"
               alt="tutorial"
               style={{
-                scale: "4",
+                transform: "scale(4)",
               }}
-              className={`absolute top-[-80px] left-[70px] z-20 transition-opacity duration-300 ${filterImageArray.length === 0 ? "opacity-100" : "opacity-0"}`}
+              className={`absolute top-[-80px] left-[70px] z-20 transition-opacity duration-1000 opacity-0 ${isTutorialOpen ? "opacity-100" : ""}`}
             />
           }
-          <IconLibraryPhoto size={28} className="text-white drop-shadow-[0_0_0.5rem_black]" />
-        </button>
+          <button
+            type="button"
+            onClick={handleIsDecoSelectOpen}
+          >
+            <IconLibraryPhoto size={28} className="text-white drop-shadow-[0_0_0.5rem_black]" />
+          </button>
+        </div>
         <button
           ref={shutterButtonRef}
           type="button"
