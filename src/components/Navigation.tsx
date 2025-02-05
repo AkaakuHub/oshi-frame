@@ -7,11 +7,12 @@ interface NavigationProps {
   readonly toggleCamera: () => void;
   readonly canSwitchCamera: boolean;
   readonly filterImageArray: string[] | null;
+  readonly setFilterImageArray: (array: string[]) => void;
   readonly filterImageIndex: number;
   readonly setFilterImageIndex: (index: number) => void;
 }
 
-export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, filterImageArray, filterImageIndex, setFilterImageIndex }: NavigationProps) {
+export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, filterImageArray, setFilterImageArray, filterImageIndex, setFilterImageIndex }: NavigationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shutterButtonRef = useRef<HTMLButtonElement>(null);
   const [isDecoSelectOpen, setIsDecoSelectOpen] = useState(false);
@@ -117,6 +118,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
         isDecoSelectOpen={isDecoSelectOpen}
         handleIsDecoSelectClose={handleIsDecoSelectClose}
         filterImageArray={filterImageArray}
+        setFilterImageArray={setFilterImageArray}
         filterImageIndex={filterImageIndex}
         setFilterImageIndex={setFilterImageIndex}
       />

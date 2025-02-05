@@ -13,7 +13,6 @@ export default function Camera() {
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
 
-  // const [filterImageURL, setFilterImageURL] = useState<string | null>(null);
   const [filterImageArray, setFilterImageArray] = useState<string[]>([]);
   const [filterImageIndex, setFilterImageIndex] = useState(0);
 
@@ -175,6 +174,7 @@ export default function Camera() {
           toggleCamera={toggleCamera}
           canSwitchCamera={canSwitchCamera}
           filterImageArray={filterImageArray}
+          setFilterImageArray={setFilterImageArray}
           filterImageIndex={filterImageIndex}
           setFilterImageIndex={setFilterImageIndex}
         />
