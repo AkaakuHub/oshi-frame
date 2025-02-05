@@ -161,7 +161,7 @@ export default function Camera() {
           maxWidth: "100%",
         }}
       />
-      {filterImageArray.length > 0 &&
+      {(filterImageArray.length > 0 && filterImageIndex >= 0) &&
         <img
           src={filterImageArray[filterImageIndex]}
           alt="sample"

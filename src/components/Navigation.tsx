@@ -54,7 +54,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
     context.drawImage(videoRef.current, sx, sy, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
 
     // filterImageURLがあれば重ねる
-    if (filterImageArray && filterImageArray.length > 0) {
+    if (filterImageArray && filterImageArray.length > 0 && filterImageIndex >= 0) {
       const filterImage = new Image();
       filterImage.src = filterImageArray[filterImageIndex];
       await new Promise((resolve) => {

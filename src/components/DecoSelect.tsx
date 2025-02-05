@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
 import { Box, Dialog, Modal, Slide } from "@mui/material";
-import { IconCopyPlus, IconX } from "@tabler/icons-react";
+import { IconBan, IconCopyPlus, IconX } from "@tabler/icons-react";
 import dynamic from "next/dynamic";
 
 const ImageEditor = dynamic(() => import("./ImageEditor"), { ssr: false });
@@ -24,10 +24,16 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
 
   const onCompleteHandler = (data: string) => {
     setFilterImageArray((prev: string[]) => [...prev, data]);
+    // ここで参照されるarrayは更新されていないので、直接lengthを参照する
+    setFilterImageIndex(filterImageArray ? filterImageArray.length : 0);
     setIsUploadModalOpen(false);
   }
 
   const handleDelete = (index: number) => {
+    // フィルターなしは-1
+    if (filterImageIndex === index) {
+      setFilterImageIndex(-1);
+    }
     setFilterImageArray((prev: string[]) => prev.filter((_, i) => i !== index));
   }
 
@@ -74,6 +80,17 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                   onClick={() => setIsUploadModalOpen(true)}
                 >
                   <IconCopyPlus size={32} className="text-black" />
+                </button>
+              </div>
+              <div
+                className="relative flex justify-center items-center"
+              >
+                <button
+                  type="button"
+                  className={`w-20 h-20 rounded-xl border-2 bg-white border-black flex justify-center items-center ${filterImageIndex === -1 ? "border-blue-500 shadow-xl" : ""}`}
+                  onClick={() => setFilterImageIndex(-1)}
+                >
+                  <IconBan size={32} className="text-black" />
                 </button>
               </div>
 
@@ -124,7 +141,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
             borderRadius: "16px",
           }}
         >
-          <ImageEditor onClose={handleModalClose} onCompleteHandler={onCompleteHandler}/>
+          <ImageEditor onClose={handleModalClose} onCompleteHandler={onCompleteHandler} />
         </Box>
       </Modal>
     </>

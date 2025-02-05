@@ -123,7 +123,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
         <Button onClick={onClose} variant="contained" color="error" startIcon={<IconX />}>
           閉じる
         </Button>
-        <Button onClick={exportCanvas} variant="contained" color="success" startIcon={<IconDeviceFloppy />}>
+        <Button onClick={exportCanvas} variant="contained" color="success" startIcon={<IconDeviceFloppy />}
+          disabled={images.length === 0}
+        >
           保存
         </Button>
       </div>
