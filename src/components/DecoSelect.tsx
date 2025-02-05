@@ -32,7 +32,10 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
   }
 
   const handleModalClose = () => {
-    setIsUploadModalOpen(false);
+    const userConfirmed = window.confirm("本当に閉じますか？");
+    if (userConfirmed) {
+      setIsUploadModalOpen(false);
+    }
   }
 
   return (

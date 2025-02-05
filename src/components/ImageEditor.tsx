@@ -77,8 +77,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
       return {
         id: `${Date.now()}-${index}`,
         src,
-        x: 100 + index * 20,
-        y: 100 + index * 20,
+        x: index * 20,
+        y: index * 20,
         scale: 1,
         zIndex: images.length + index,
       };
@@ -136,11 +136,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
       >
         <div
           style={{
-            width: STAGE_WIDTH,
+            width: `{${STAGE_WIDTH} - 4}`,
             height: STAGE_HEIGHT,
             transform: `scale(${scale})`,
           }}
-          className="solid-border border-2 border-black"
+          className="solid-border border-4 border-black"
         >
           <Stage width={STAGE_WIDTH} height={STAGE_HEIGHT} ref={stageRef}>
             <Layer>
