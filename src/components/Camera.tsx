@@ -16,6 +16,8 @@ export default function Camera() {
   const [filterImageArray, setFilterImageArray] = useState<string[]>([]);
   const [filterImageIndex, setFilterImageIndex] = useState(0);
 
+  const [isCameraLoading, setIsCameraLoading] = useState(true);
+
   const getStream = useCallback(() => {
     if (videoDevices.length === 0) return;
     // 選択中のデバイスを使用
@@ -47,6 +49,7 @@ export default function Camera() {
       .catch((error) => {
         console.error("getUserMediaエラー:", error);
       });
+    setIsCameraLoading(false);
   }, [videoDevices, currentDeviceIndex]);
 
   useEffect(() => {
@@ -172,7 +175,9 @@ export default function Camera() {
             maxWidth: "100%",
           }}
         />}
-
+      {isCameraLoading && <div className="absolute inset-0 flex justify-center items-center z-20 w-full h-full bg-white">
+        Loading...
+      </div>}
       {videoRef.current && (
         <Navigation
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
