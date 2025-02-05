@@ -22,6 +22,7 @@ interface DraggableImageProps {
   onPinch: (id: string, newScale: number, newX: number, newY: number) => void;
   onBringForward: (id: string) => void;
   onSelect: (id: string) => void;
+  currentEditingId: string | null;
 }
 
 const DraggableImage: React.FC<DraggableImageProps> = ({
@@ -31,6 +32,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({
   onPinch,
   onBringForward,
   onSelect,
+  currentEditingId,
 }) => {
   const [img] = useImage(image.src);
   // ピンチ操作用の初期状態を保持するためのref
@@ -110,6 +112,8 @@ const DraggableImage: React.FC<DraggableImageProps> = ({
         onBringForward(image.id);
         onSelect(image.id);
       }}
+      stroke={image.id === currentEditingId ? "#1da1f2" : undefined}
+      strokeWidth={8}
     />
   );
 };
@@ -316,6 +320,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
                     onPinch={handlePinch}
                     onBringForward={bringForward}
                     onSelect={handleSelect}
+                    currentEditingId={currentEditingId}
                   />
                 ))}
             </Layer>
