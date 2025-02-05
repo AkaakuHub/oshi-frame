@@ -3,7 +3,7 @@ import type React from "react";
 import { Stage, Layer, Image } from "react-konva";
 import useImage from "use-image";
 import type Konva from "konva";
-import { Button } from "@mui/material";
+import { Button, Input } from "@mui/material";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 
 interface UploadedImage {
@@ -42,9 +42,10 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onDragMove, onWh
 
 interface ImageEditorProps {
   readonly onCompleteHandler: (data: string) => void;
+  readonly onClose: () => void;
 }
 
-const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler }) => {
+const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose }) => {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -116,17 +117,22 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler }) => {
 
   return (
     <div
-      className="w-[80vw] h-[80dvh]"
+      className="w-[80vw] h-[80dvh] p-2 flex flex-col justify-between items-center gap-4"
     >
-      <div>
-        <input type="file" accept="image/*" multiple onChange={handleImageUpload} />
+      <div className="flex justify-between items-center w-full">
+        <Button onClick={onClose} variant="contained" color="error">
+          閉じる
+        </Button>
         <Button onClick={exportCanvas} variant="contained" color="success" startIcon={<IconDeviceFloppy />}>
           保存
         </Button>
       </div>
       <div
         ref={containerRef}
-        className="w-full h-full flex justify-center items-center"
+        className="w-full flex justify-center items-center"
+        style={{
+          height: "calc(100% - 80px)",
+        }}
       >
         <div
           style={{
@@ -152,6 +158,26 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler }) => {
             </Layer>
           </Stage>
         </div>
+      </div>
+      <div className="h-12 flex justify-center items-center">
+        <label htmlFor="upload-image"
+        >
+          <Input
+            id="upload-image"
+            type="file"
+            inputProps={{ accept: "image/*", multiple: false }}
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+          />
+          <Button
+            component="span"
+            variant="contained"
+            color="primary"
+            startIcon={<IconDeviceFloppy />}
+          >
+            画像をアップロード
+          </Button>
+        </label>
       </div>
     </div>
   );

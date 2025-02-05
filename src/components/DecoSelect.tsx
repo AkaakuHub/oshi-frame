@@ -31,6 +31,10 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
     setFilterImageArray((prev: string[]) => prev.filter((_, i) => i !== index));
   }
 
+  const handleModalClose = () => {
+    setIsUploadModalOpen(false);
+  }
+
   return (
     <>
       <div className="relative z-20">
@@ -117,7 +121,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
             borderRadius: "16px",
           }}
         >
-          <ImageEditor onCompleteHandler={onCompleteHandler}/>
+          <ImageEditor onClose={handleModalClose} onCompleteHandler={onCompleteHandler}/>
         </Box>
       </Modal>
     </>
