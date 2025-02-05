@@ -93,7 +93,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
         <div
           className="relative w-14 h-14 flex justify-center items-center"
         >
-          {filterImageArray &&
+          {filterImageArray && filterImageArray.length === 0 &&
             <img
               src="/tutorial1.png"
               alt="tutorial"

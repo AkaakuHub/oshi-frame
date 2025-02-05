@@ -169,7 +169,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
             borderRadius: "16px",
           }}
         >
-          <div className="p-4 w-[200px] flex flex-col items-center">
+          <div className="p-2 px-4 w-[200px] flex flex-col items-center text-xl gap-2">
             <p>本当に閉じますか？</p>
             <div className="flex flex-row justify-between w-full mt-4 ">
               <Button onClick={() => setIsDoubleCheckModalOpen(false)} color="info"

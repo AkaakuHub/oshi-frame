@@ -207,8 +207,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     newImages.push({
       id,
       src,
-      x: 100 + index * 20,
-      y: 100 + index * 20,
+      x: 0,
+      y: 0,
       scale: 1,
       zIndex: images.length + index,
     });
