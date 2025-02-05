@@ -22,7 +22,7 @@ interface DraggableImageProps {
   onPinch: (id: string, newScale: number, newX: number, newY: number) => void;
   onBringForward: (id: string) => void;
   onSelect: (id: string) => void;
-  currentEditingId: string | null;
+  isSelected: boolean;
 }
 
 const DraggableImage: React.FC<DraggableImageProps> = ({
@@ -32,7 +32,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({
   onPinch,
   onBringForward,
   onSelect,
-  currentEditingId,
+  isSelected,
 }) => {
   const [img] = useImage(image.src);
   // ピンチ操作用の初期状態を保持するためのref
@@ -112,7 +112,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({
         onBringForward(image.id);
         onSelect(image.id);
       }}
-      stroke={image.id === currentEditingId ? "#1da1f2" : undefined}
+      stroke={isSelected ? "#1da1f2" : undefined}
       strokeWidth={8}
     />
   );
@@ -250,17 +250,28 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
   };
 
   const exportCanvas = () => {
-    if (stageRef.current) {
-      // 一時的にスケールをリセットしてからデータURLを取得
-      const originalScale = stageRef.current.scaleX();
-      stageRef.current.scale({ x: 1, y: 1 });
-      const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-      stageRef.current.scale({ x: originalScale, y: originalScale });
-      onCompleteHandler(dataURL);
-    }
+    // 青い枠線を消すために選択状態を解除
+    setCurrentEditingId(null);
+    // まずは選択状態を解除して再レンダリングされるのを待つ
+    requestAnimationFrame(() => {
+      // 更に一度描画完了を待つ
+      requestAnimationFrame(() => {
+        if (stageRef.current) {
+          // 必要に応じてキャンバスの scale を一時的にリセット
+          const originalScale = stageRef.current.scaleX();
+          stageRef.current.scale({ x: 1, y: 1 });
+          // キャンバスを再描画
+          stageRef.current.batchDraw();
+          const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+          // スケールを元に戻す
+          stageRef.current.scale({ x: originalScale, y: originalScale });
+          onCompleteHandler(dataURL);
+        }
+      });
+    });
   };
 
-  // 現在編集中の画像の scale を取得（なければ 1）
+  // 現在編集中の画像のscaleを取得（なければ 1）
   const currentImageScale =
     currentEditingId && images.find((img) => img.id === currentEditingId)
       ? images.find((img) => img.id === currentEditingId)?.scale ?? 1
@@ -321,7 +332,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
                     onPinch={handlePinch}
                     onBringForward={bringForward}
                     onSelect={handleSelect}
-                    currentEditingId={currentEditingId}
+                    isSelected={img.id === currentEditingId}
                   />
                 ))}
             </Layer>
