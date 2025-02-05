@@ -268,6 +268,12 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
             width: `{${STAGE_WIDTH} - 4}`,
             height: `{${STAGE_HEIGHT} - 4}`,
             transform: `scale(${containerScale})`,
+            backgroundImage: `linear-gradient(45deg, #eee 25%, transparent 25%),
+                              linear-gradient(135deg, #eee 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #eee 75%),
+                              linear-gradient(135deg, transparent 75%, #eee 75%)`,
+            backgroundSize: "80px 80px",
+            backgroundPosition: "0 0, 40px 0, 40px -40px, 0px 40px"
           }}
           className="solid-border border-4 border-black"
         >

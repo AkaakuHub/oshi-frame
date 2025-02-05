@@ -65,7 +65,7 @@ export default function Camera() {
         event.preventDefault();
       }
     };
-    document.addEventListener('touchstart', touchHandler, {
+    document.addEventListener("touchstart", touchHandler, {
       passive: false
     });
 
