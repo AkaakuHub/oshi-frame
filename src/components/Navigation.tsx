@@ -67,11 +67,9 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
-
-      const text: string = "画像です。";
       const file = new File([blob], "photo.png", { type: "image/png" });
       navigator.share({
-        text: decodeURI(text),
+        // text: decodeURI(text),
         files: [file],
       }).catch((error) => {
         console.log("Sharing failed", error);

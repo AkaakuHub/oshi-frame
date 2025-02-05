@@ -54,16 +54,17 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                 width: "100%",
                 borderRadius: "16px 16px 0 0",
                 zIndex: 20,
+                backgroundColor: "#fefff1",
               }
             }
           }}
           keepMounted
         >
-          <div className="relative bg-white min-h-[400px] max-w-full">
+          <div className="relative min-h-[400px] max-w-full">
             <IconX size={36} onClick={handleIsDecoSelectClose} className="cursor-pointer absolute top-0 right-0" />
             <div className="mt-14 px-4 grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-4">
               <div
-                className="relative flex justify-center items-center"
+                className="relative flex justify-center items-center bg-white"
               >
                 <button
                   type="button"
@@ -77,7 +78,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                 filterImageArray.map((filterImage: string, index: number) => (
                   <div
                     key={filterImage}
-                    className="relative flex justify-center items-center"
+                    className="relative flex justify-center items-center bg-white"
                   >
                     <button
                       type="button"
