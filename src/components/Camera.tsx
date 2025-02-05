@@ -14,7 +14,7 @@ export default function Camera() {
   const [viewportHeight, setViewportHeight] = useState(0);
 
   const [filterImageArray, setFilterImageArray] = useState<string[]>([]);
-  const [filterImageIndex, setFilterImageIndex] = useState(0);
+  const [filterImageIndex, setFilterImageIndex] = useState(-1);
 
   const [isCameraLoading, setIsCameraLoading] = useState(true);
 
