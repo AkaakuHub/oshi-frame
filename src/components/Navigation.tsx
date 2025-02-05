@@ -89,17 +89,17 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
           onClick={handleIsDecoSelectOpen}
 
         >
-          <IconLibraryPhoto size={28} className="text-white" />
+          <IconLibraryPhoto size={28} className="text-white drop-shadow-[0_0_0.5rem_black]" />
         </button>
 
         <button
           ref={shutterButtonRef}
           type="button"
-          className="w-20 h-20 flex justify-center items-center rounded-full border-4 border-black bg-transparent"
+          className="w-20 h-20 flex justify-center items-center rounded-full border-4 border-white bg-transparent"
           onClick={handleCapture}
         >
           <div className="w-[4.5rem] h-[4.5rem] flex justify-center items-center rounded-full">
-            <div className="w-[4rem] h-[4rem] bg-white rounded-full" />
+            <div className="w-[4rem] h-[4rem] bg-white rounded-full drop-shadow-[0rem_0_0.5rem_black]" />
           </div>
         </button>
         {canSwitchCamera ? (
@@ -108,7 +108,7 @@ export default function Navigation({ videoRef, toggleCamera, canSwitchCamera, fi
             className="w-14 h-14 flex justify-center items-center"
             onClick={toggleCamera}
           >
-            <IconCameraRotate size={28} className="text-white" />
+            <IconCameraRotate size={28} className="text-white drop-shadow-[0_0_0.5rem_black]" />
           </button>
         ) : (
           <div className="w-14 h-14" />
