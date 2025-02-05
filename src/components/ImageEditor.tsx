@@ -113,7 +113,7 @@ const DraggableImage: React.FC<DraggableImageProps> = ({
         onSelect(image.id);
       }}
       stroke={isSelected ? "#1da1f2" : undefined}
-      strokeWidth={8}
+      strokeWidth={8 / image.scale}
     />
   );
 };
@@ -135,8 +135,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
   const [exporting, setExporting] = useState(false);
   const currentEditingIdRef = useRef<string | null>(currentEditingId);
 
+  const [isBackwardDisabled, setIsBackwardDisabled] = useState(true);
+
   useEffect(() => {
     currentEditingIdRef.current = currentEditingId;
+    setIsBackwardDisabled(false);
   }, [currentEditingId]);
 
   useEffect(() => {
@@ -248,6 +251,18 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     });
   };
 
+  const bringBackward = () => {
+    setIsBackwardDisabled(true);
+    setImages((prev) => {
+      const minZIndex = Math.min(...prev.map((img) => img.zIndex), 0) - 1;
+      // 最背面がcurrentEditingIdなら何もしない
+      for (const img of prev) {
+        if (img.zIndex === minZIndex && img.id === currentEditingId) return prev;
+      }
+      return prev.map((img) => (img.id === currentEditingId ? { ...img, zIndex: minZIndex } : img));
+    });
+  };
+
   const handleSelect = (id: string) => {
     setCurrentEditingId(id);
     bringForward(id); // 選択した画像を一番手前にする
@@ -268,27 +283,27 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     setCurrentEditingId(null);
   };
 
-const exportCanvas = () => {
-  // 青い枠線を外すために選択状態を解除
-	setCurrentEditingId(null);
-	// まずは選択状態を解除して再レンダリングされるのを待つ
-	requestAnimationFrame(() => {
-		// 更に一度描画完了を待つ
-		requestAnimationFrame(() => {
-			if (stageRef.current) {
-				// 必要に応じてキャンバスのscaleを一時的にリセット
-				const originalScale = stageRef.current.scaleX();
-				stageRef.current.scale({ x: 1, y: 1 });
-				// キャンバスを再描画
-				stageRef.current.batchDraw();
-				const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
-				// スケールを元に戻す
-				stageRef.current.scale({ x: originalScale, y: originalScale });
-				onCompleteHandler(dataURL);
-			}
-		});
-	});
-};
+  const exportCanvas = () => {
+    // 青い枠線を外すために選択状態を解除
+    setCurrentEditingId(null);
+    // まずは選択状態を解除して再レンダリングされるのを待つ
+    requestAnimationFrame(() => {
+      // 更に一度描画完了を待つ
+      requestAnimationFrame(() => {
+        if (stageRef.current) {
+          // 必要に応じてキャンバスのscaleを一時的にリセット
+          const originalScale = stageRef.current.scaleX();
+          stageRef.current.scale({ x: 1, y: 1 });
+          // キャンバスを再描画
+          stageRef.current.batchDraw();
+          const dataURL = stageRef.current.toDataURL({ pixelRatio: 1 });
+          // スケールを元に戻す
+          stageRef.current.scale({ x: originalScale, y: originalScale });
+          onCompleteHandler(dataURL);
+        }
+      });
+    });
+  };
   // 現在編集中の画像のscaleを取得（なければ 1）
   const currentImageScale =
     currentEditingId && images.find((img) => img.id === currentEditingId)
@@ -362,23 +377,32 @@ const exportCanvas = () => {
           <Slider
             value={currentImageScale}
             min={0.1}
-            max={5.0}
-            step={0.01}
+            max={3.0}
+            step={0.05}
             onChange={(e, value) => handleSliderChange(e, value as number)}
             aria-labelledby="image-scale-slider"
             disabled={!currentEditingId}
           />
         </div>
         <div className="w-full flex justify-between items-center">
-          <Button
-            onClick={deleteCurrentImage}
-            variant="contained"
-            color="error"
-            startIcon={<IconTrash />}
-            disabled={!currentEditingId}
-          >
-            削除
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              onClick={deleteCurrentImage}
+              variant="contained"
+              color="error"
+              disabled={!currentEditingId}
+            >
+              <IconTrash />
+            </Button>
+            <Button
+              onClick={bringBackward}
+              variant="contained"
+              color="primary"
+              disabled={!currentEditingId || isBackwardDisabled}
+            >
+              最背面
+            </Button>
+          </div>
           <label htmlFor="upload-image">
             <Input
               id="upload-image"
