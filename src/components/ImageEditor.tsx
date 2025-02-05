@@ -4,7 +4,7 @@ import { Stage, Layer, Image } from "react-konva";
 import useImage from "use-image";
 import type Konva from "konva";
 import { Button, Input } from "@mui/material";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { IconDeviceFloppy, IconX } from "@tabler/icons-react";
 
 interface UploadedImage {
   id: string;
@@ -120,7 +120,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
       className="w-[80vw] h-[80dvh] p-2 flex flex-col justify-between items-center gap-4"
     >
       <div className="flex justify-between items-center w-full">
-        <Button onClick={onClose} variant="contained" color="error">
+        <Button onClick={onClose} variant="contained" color="error" startIcon={<IconX />}>
           閉じる
         </Button>
         <Button onClick={exportCanvas} variant="contained" color="success" startIcon={<IconDeviceFloppy />}>
@@ -137,7 +137,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
         <div
           style={{
             width: `{${STAGE_WIDTH} - 4}`,
-            height: STAGE_HEIGHT,
+            height: `{${STAGE_HEIGHT} - 4}`,
             transform: `scale(${scale})`,
           }}
           className="solid-border border-4 border-black"
