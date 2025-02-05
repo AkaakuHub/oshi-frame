@@ -3,8 +3,8 @@ import type React from "react";
 import { Stage, Layer, Image } from "react-konva";
 import useImage from "use-image";
 import type Konva from "konva";
-import { Button, Input } from "@mui/material";
-import { IconDeviceFloppy, IconX } from "@tabler/icons-react";
+import { Button, Input, Slider } from "@mui/material";
+import { IconDeviceFloppy, IconX, IconTrash, IconUpload } from "@tabler/icons-react";
 
 interface UploadedImage {
   id: string;
@@ -19,11 +19,78 @@ interface DraggableImageProps {
   image: UploadedImage;
   onDragMove: (id: string, x: number, y: number) => void;
   onWheel: (id: string, event: Konva.KonvaEventObject<WheelEvent>) => void;
+  onPinch: (id: string, newScale: number, newX: number, newY: number) => void;
   onBringForward: (id: string) => void;
+  onSelect: (id: string) => void;
 }
 
-const DraggableImage: React.FC<DraggableImageProps> = ({ image, onDragMove, onWheel, onBringForward }) => {
+const DraggableImage: React.FC<DraggableImageProps> = ({
+  image,
+  onDragMove,
+  onWheel,
+  onPinch,
+  onBringForward,
+  onSelect,
+}) => {
   const [img] = useImage(image.src);
+  // ピンチ操作用の初期状態を保持するためのref
+  const pinchState = useRef<{
+    initialDistance: number;
+    initialScale: number;
+    center: { x: number; y: number };
+  } | null>(null);
+
+  // タッチ開始時に現在編集中の画像として選択
+  const handleTouchStart = (e: Konva.KonvaEventObject<TouchEvent>) => {
+    onSelect(image.id);
+    const touches = e.evt.touches;
+    if (touches && touches.length === 2 && img) {
+      const touch1 = touches[0];
+      const touch2 = touches[1];
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      const initialDistance = Math.hypot(dx, dy);
+      pinchState.current = {
+        initialDistance,
+        initialScale: image.scale,
+        center: {
+          x: image.x + (img.width * image.scale) / 2,
+          y: image.y + (img.height * image.scale) / 2,
+        },
+      };
+    }
+  };
+
+  const handleTouchMove = (e: Konva.KonvaEventObject<TouchEvent>) => {
+    const touches = e.evt.touches;
+    if (pinchState.current && touches && touches.length === 2 && img) {
+      const touch1 = touches[0];
+      const touch2 = touches[1];
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      const newDistance = Math.hypot(dx, dy);
+      const scaleFactor = newDistance / pinchState.current.initialDistance;
+      const newScale = pinchState.current.initialScale * scaleFactor;
+      // 画像の中心が維持されるように、新しい位置を計算
+      const newX = pinchState.current.center.x - (img.width * newScale) / 2;
+      const newY = pinchState.current.center.y - (img.height * newScale) / 2;
+      window.requestAnimationFrame(() => {
+        onPinch(image.id, newScale, newX, newY);
+      });
+    }
+  };
+
+  const handleTouchEnd = (e: Konva.KonvaEventObject<TouchEvent>) => {
+    if (e.evt.touches.length < 2) {
+      pinchState.current = null;
+    }
+  };
+
+  // マウス時にも選択状態にする
+  const handleMouseDown = () => {
+    onSelect(image.id);
+  };
+
   return (
     <Image
       image={img}
@@ -35,7 +102,14 @@ const DraggableImage: React.FC<DraggableImageProps> = ({ image, onDragMove, onWh
       draggable
       onDragMove={(e) => onDragMove(image.id, e.target.x(), e.target.y())}
       onWheel={(e) => onWheel(image.id, e)}
-      onClick={() => onBringForward(image.id)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onClick={() => {
+        onBringForward(image.id);
+        onSelect(image.id);
+      }}
     />
   );
 };
@@ -47,9 +121,11 @@ interface ImageEditorProps {
 
 const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose }) => {
   const [images, setImages] = useState<UploadedImage[]>([]);
+  const [currentEditingId, setCurrentEditingId] = useState<string | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  // コンテナに合わせた自動スケール
+  const [containerScale, setContainerScale] = useState(1);
   const STAGE_WIDTH = 1080;
   const STAGE_HEIGHT = 1920;
 
@@ -59,8 +135,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
       if (container) {
         const containerWidth = container.offsetWidth;
         const containerHeight = container.offsetHeight;
-        const scale = Math.min(containerWidth / STAGE_WIDTH, containerHeight / STAGE_HEIGHT)
-        setScale(scale);
+        const scale = Math.min(containerWidth / STAGE_WIDTH, containerHeight / STAGE_HEIGHT);
+        setContainerScale(scale);
       }
     };
     fitStageIntoParentContainer();
@@ -87,21 +163,59 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
   };
 
   const handleDragMove = (id: string, x: number, y: number) => {
-    setImages((prev) => prev.map(img => img.id === id ? { ...img, x, y } : img));
+    setImages((prev) =>
+      prev.map((img) => (img.id === id ? { ...img, x, y } : img))
+    );
   };
 
   const handleWheel = (id: string, event: Konva.KonvaEventObject<WheelEvent>) => {
     event.evt.preventDefault();
-    setImages((prev) => prev.map(img =>
-      img.id === id ? { ...img, scale: Math.max(0.1, img.scale + event.evt.deltaY * -0.001) } : img
-    ));
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id
+          ? { ...img, scale: Math.max(0.1, img.scale + event.evt.deltaY * -0.001) }
+          : img
+      )
+    );
+  };
+
+  const handlePinch = (
+    id: string,
+    newScale: number,
+    newX: number,
+    newY: number
+  ) => {
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id ? { ...img, scale: Math.max(0.1, newScale), x: newX, y: newY } : img
+      )
+    );
   };
 
   const bringForward = (id: string) => {
     setImages((prev) => {
-      const maxZIndex = Math.max(...prev.map(img => img.zIndex), 0) + 1;
-      return prev.map(img => img.id === id ? { ...img, zIndex: maxZIndex } : img);
+      const maxZIndex = Math.max(...prev.map((img) => img.zIndex), 0) + 1;
+      return prev.map((img) => (img.id === id ? { ...img, zIndex: maxZIndex } : img));
     });
+  };
+
+  const handleSelect = (id: string) => {
+    setCurrentEditingId(id);
+  };
+
+  // スライダーで現在編集中の画像のscaleを変更
+  const handleSliderChange = (event: Event, value: number) => {
+    if (typeof value !== "number" || !currentEditingId) return;
+    setImages((prev) =>
+      prev.map((img) => (img.id === currentEditingId ? { ...img, scale: value } : img))
+    );
+  };
+
+  // 現在編集中の画像を削除
+  const deleteCurrentImage = () => {
+    if (!currentEditingId) return;
+    setImages((prev) => prev.filter((img) => img.id !== currentEditingId));
+    setCurrentEditingId(null);
   };
 
   const exportCanvas = () => {
@@ -115,15 +229,28 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     }
   };
 
+  // 現在編集中の画像の scale を取得（なければ 1）
+  const currentImageScale =
+    currentEditingId && images.find((img) => img.id === currentEditingId)
+      ? images.find((img) => img.id === currentEditingId)?.scale ?? 1
+      : 1;
+
   return (
-    <div
-      className="w-[80vw] h-[80dvh] p-2 flex flex-col justify-between items-center gap-4"
-    >
-      <div className="flex justify-between items-center w-full">
-        <Button onClick={onClose} variant="contained" color="error" startIcon={<IconX />}>
+    <div className="w-[80vw] h-[80dvh] p-2 flex flex-col justify-between items-center gap-4">
+      <div className="flex justify-between items-center w-full px-4">
+        <Button
+          onClick={onClose}
+          variant="contained"
+          color="error"
+          startIcon={<IconX />}
+        >
           閉じる
         </Button>
-        <Button onClick={exportCanvas} variant="contained" color="success" startIcon={<IconDeviceFloppy />}
+        <Button
+          onClick={exportCanvas}
+          variant="contained"
+          color="success"
+          startIcon={<IconDeviceFloppy />}
           disabled={images.length === 0}
         >
           保存
@@ -131,16 +258,16 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
       </div>
       <div
         ref={containerRef}
-        className="w-full flex justify-center items-center"
+        className="w-full flex flex-col justify-center items-center"
         style={{
-          height: "calc(100% - 80px)",
+          height: "calc(100% - 160px)",
         }}
       >
         <div
           style={{
             width: `{${STAGE_WIDTH} - 4}`,
             height: `{${STAGE_HEIGHT} - 4}`,
-            transform: `scale(${scale})`,
+            transform: `scale(${containerScale})`,
           }}
           className="solid-border border-4 border-black"
         >
@@ -154,32 +281,58 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
                     image={img}
                     onDragMove={handleDragMove}
                     onWheel={handleWheel}
+                    onPinch={handlePinch}
                     onBringForward={bringForward}
+                    onSelect={handleSelect}
                   />
                 ))}
             </Layer>
           </Stage>
         </div>
       </div>
-      <div className="h-12 flex justify-center items-center">
-        <label htmlFor="upload-image"
-        >
-          <Input
-            id="upload-image"
-            type="file"
-            inputProps={{ accept: "image/*", multiple: false }}
-            onChange={handleImageUpload}
-            style={{ display: "none" }}
-          />
+      <div className="h-12 flex justify-center items-center flex-col gap-2 p-4 w-full">
+        <div className="w-full">
+          {currentEditingId ? (
+            <Slider
+              value={currentImageScale}
+              min={0.1}
+              max={5.0}
+              step={0.01}
+              onChange={(e, value) => handleSliderChange(e, value as number)}
+              aria-labelledby="image-scale-slider"
+            />
+          ) : (
+            <div className="w-full h-[50px]" />
+          )}
+        </div>
+        <div className="w-full flex justify-between items-center">
           <Button
-            component="span"
+            onClick={deleteCurrentImage}
             variant="contained"
-            color="primary"
-            startIcon={<IconDeviceFloppy />}
+            color="error"
+            startIcon={<IconTrash />}
+            disabled={!currentEditingId}
           >
-            画像をアップロード
+            削除
           </Button>
-        </label>
+          <label htmlFor="upload-image">
+            <Input
+              id="upload-image"
+              type="file"
+              inputProps={{ accept: "image/*", multiple: false }}
+              onChange={handleImageUpload}
+              style={{ display: "none" }}
+            />
+            <Button
+              component="span"
+              variant="contained"
+              color="primary"
+              startIcon={<IconUpload />}
+            >
+              アップロード
+            </Button>
+          </label>
+        </div>
       </div>
     </div>
   );

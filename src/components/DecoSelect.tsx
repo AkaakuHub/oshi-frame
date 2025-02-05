@@ -128,7 +128,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
       </div>
       <Modal
         open={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
+        onClose={handleModalClose}
       >
         <Box
           sx={{
