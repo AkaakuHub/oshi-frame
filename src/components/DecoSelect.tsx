@@ -57,7 +57,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
         >
           <div className="relative bg-white min-h-[400px] max-w-full">
             <IconX size={36} onClick={handleIsDecoSelectClose} className="cursor-pointer absolute top-0 right-0" />
-            <div className="mt-14 px-4 flex flex-wrap justify-evenly content-evenly gap-4">
+            <div className="mt-14 px-4 grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-4">
               <div
                 className="relative flex justify-center items-center"
               >
