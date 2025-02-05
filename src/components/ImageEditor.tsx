@@ -144,22 +144,48 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
     return () => window.removeEventListener("resize", fitStageIntoParentContainer);
   }, []);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImagePromise = async (file: File, index: number, newImages: UploadedImage[]) => {
+    const dataUrl = await readFileAsDataURL(file);
+    handleFileLoad(dataUrl, newImages, index);
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
-    const newImages: UploadedImage[] = Array.from(files).map((file, index) => {
-      const src = URL.createObjectURL(file);
-      return {
-        id: `${Date.now()}-${index}`,
-        src,
-        x: index * 20,
-        y: index * 20,
-        scale: 1,
-        zIndex: images.length + index,
-      };
-    });
+    const newImages: UploadedImage[] = [];
+    const filePromises = Array.from(files).map((file, index) => handleImagePromise(file, index, newImages));
+
+    await Promise.all(filePromises);
     setImages((prev) => [...prev, ...newImages]);
+
+    // ファイル選択をリセット
+    event.target.value = '';
+  };
+
+
+  const handleFileLoad = (
+    src: string,
+    newImages: UploadedImage[],
+    index: number
+  ) => {
+    const id = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 11)}`;
+    newImages.push({
+      id,
+      src,
+      x: 100 + index * 20,
+      y: 100 + index * 20,
+      scale: 1,
+      zIndex: images.length + index,
+    });
   };
 
   const handleDragMove = (id: string, x: number, y: number) => {
