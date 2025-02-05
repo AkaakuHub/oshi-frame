@@ -231,6 +231,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
 
   const handleSelect = (id: string) => {
     setCurrentEditingId(id);
+    bringForward(id); // 選択した画像を一番手前にする
   };
 
   // スライダーで現在編集中の画像のscaleを変更
