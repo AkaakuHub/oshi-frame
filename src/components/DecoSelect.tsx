@@ -71,7 +71,7 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                 width: "100%",
                 borderRadius: "16px 16px 0 0",
                 zIndex: 20,
-                background: "linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0.75) 100%)",
+                background: "linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 1) 100%)",
               }
             }
           }}
@@ -130,6 +130,12 @@ const DecoSelect = ({ isDecoSelectOpen, handleIsDecoSelectClose, filterImageArra
                   </div>
                 ))
               )}
+            </div>
+            <div className="absolute bottom-0 mt-4 px-4 text-center text-sm"
+              style={{
+                textWrap: "balance"
+              }}>
+              作成した画像はローカルに保存され、サーバーに保存されることはありません。
             </div>
           </div>
         </Dialog>
