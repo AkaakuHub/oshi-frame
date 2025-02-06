@@ -417,7 +417,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ onCompleteHandler, onClose })
               color="primary"
               startIcon={<IconUpload />}
             >
-              アップロード
+              画像を追加
             </Button>
           </label>
         </div>
